@@ -11,7 +11,6 @@ static const CGFloat kMaxUIImageSize = 1024;
 static const CGFloat kPreviewImageSize = 120;
 static const CGFloat kDefaultCropWidth = 320;
 static const CGFloat kDefaultCropHeight = 320;
-static const CGFloat kBoundingBoxInset = 15;
 static const NSTimeInterval kAnimationIntervalReset = 0.25;
 static const NSTimeInterval kAnimationIntervalTransform = 0.2;
 
@@ -299,12 +298,14 @@ static const NSTimeInterval kAnimationIntervalTransform = 0.2;
     [self startTransformHook];
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        
+        CGRect circleCropRect = CGRectInset(self.cropRect, self.cropInset, self.cropInset);
         CGImageRef resultRef = [self newTransformedImage:self.imageView.transform
                                         sourceImage:self.sourceImage.CGImage
                                          sourceSize:self.sourceImage.size
                                   sourceOrientation:self.sourceImage.imageOrientation
                                         outputWidth:self.outputWidth ? self.outputWidth : self.sourceImage.size.width
-                                            cropRect:self.cropRect
+                                            cropRect:circleCropRect
                                     imageViewSize:self.imageView.bounds.size];
         dispatch_async(dispatch_get_main_queue(), ^{
             UIImage *transform =  [UIImage imageWithCGImage:resultRef scale:1.0 orientation:UIImageOrientationUp];

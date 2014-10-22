@@ -1,6 +1,7 @@
 #import "HFImageEditorFrameView.h"
 #import "QuartzCore/QuartzCore.h"
 
+const CGFloat HFRoundedImageCropInset = 15.0f;
 
 @interface HFImageEditorFrameView ()
 @property (nonatomic,strong) UIImageView *imageView;
@@ -48,13 +49,17 @@
     if(!CGRectEqualToRect(_cropRect,cropRect)){
         _cropRect = CGRectOffset(cropRect, self.frame.origin.x, self.frame.origin.y);
         UIGraphicsBeginImageContextWithOptions(self.bounds.size, NO, 0.f);
-        CGContextRef context = UIGraphicsGetCurrentContext();
+        
+        CGFloat circleInset = HFRoundedImageCropInset;
+        UIBezierPath *clipPath = [UIBezierPath bezierPathWithRect:CGRectInfinite];
+        CGRect circleRect = CGRectInset(_cropRect, circleInset, circleInset);
+        UIBezierPath *circlePath = [UIBezierPath bezierPathWithOvalInRect:circleRect];
+        [clipPath appendPath:circlePath];
+        clipPath.usesEvenOddFillRule = YES;
+        [clipPath addClip];
+        
         [[UIColor blackColor] setFill];
         UIRectFill(self.bounds);
-        CGContextSetStrokeColorWithColor(context, [[UIColor whiteColor] colorWithAlphaComponent:0.5].CGColor);
-        CGContextStrokeRect(context, cropRect);
-        [[UIColor clearColor] setFill];
-        UIRectFill(CGRectInset(cropRect, 1, 1));
         self.imageView.image = UIGraphicsGetImageFromCurrentImageContext();
 
         UIGraphicsEndImageContext();
