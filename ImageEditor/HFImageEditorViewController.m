@@ -252,6 +252,23 @@ static const NSTimeInterval kAnimationIntervalTransform = 0.2;
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
+- (void)adjustRelativeCropSize
+{
+    // Do nothing
+}
+
+- (void)adjustImageEditorOnRotation
+{
+    [self adjustRelativeCropSize];
+    [self reset:YES];
+}
+
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+{
+    [super didRotateFromInterfaceOrientation:fromInterfaceOrientation];
+    [self adjustImageEditorOnRotation];
+}
+
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
