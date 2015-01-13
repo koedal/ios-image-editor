@@ -1,7 +1,7 @@
 #import "HFImageEditorFrameView.h"
 #import "QuartzCore/QuartzCore.h"
 
-const CGFloat HFRoundedImageCropInset = 15.0f;
+const CGFloat HFRoundedImageCropInsetPercent = 0.05f;
 
 @interface HFImageEditorFrameView ()
 @property (nonatomic,strong) UIImageView *imageView;
@@ -18,9 +18,17 @@ const CGFloat HFRoundedImageCropInset = 15.0f;
     self.opaque = NO;
     self.layer.opacity = 0.7;
     self.backgroundColor = [UIColor clearColor];
+    
     UIImageView *imageView = [[UIImageView alloc] initWithFrame:self.bounds];
-    imageView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    imageView.contentMode = UIViewContentModeScaleAspectFill;
+    [imageView setTranslatesAutoresizingMaskIntoConstraints:NO];
     [self addSubview:imageView];
+    
+    NSDictionary *views = NSDictionaryOfVariableBindings(imageView);
+    NSMutableArray *constraints = [[NSLayoutConstraint constraintsWithVisualFormat:@"|-0-[imageView]-0-|" options:0 metrics:nil views:views] mutableCopy];
+    [constraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-0-[imageView]-0-|" options:0 metrics:nil views:views]];
+    
+    [self addConstraints:[constraints copy]];
     self.imageView = imageView;
 }
 
@@ -42,15 +50,13 @@ const CGFloat HFRoundedImageCropInset = 15.0f;
     return self;
 }
 
-
-
 - (void)setCropRect:(CGRect)cropRect
 {
     if(!CGRectEqualToRect(_cropRect,cropRect)){
         _cropRect = CGRectOffset(cropRect, self.frame.origin.x, self.frame.origin.y);
         UIGraphicsBeginImageContextWithOptions(self.bounds.size, NO, 0.f);
         
-        CGFloat circleInset = HFRoundedImageCropInset;
+        CGFloat circleInset = MIN(self.frame.size.width, self.frame.size.height) * HFRoundedImageCropInsetPercent;
         UIBezierPath *clipPath = [UIBezierPath bezierPathWithRect:CGRectInfinite];
         CGRect circleRect = CGRectInset(_cropRect, circleInset, circleInset);
         UIBezierPath *circlePath = [UIBezierPath bezierPathWithOvalInRect:circleRect];
