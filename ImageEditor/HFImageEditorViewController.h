@@ -31,6 +31,9 @@ typedef void(^HFImageEditorDoneCallback)(UIImage *image, BOOL canceled);
 
 - (void)reset:(BOOL)animated;
 
+// Does nothing. Subclasses can override to tie into setting the crop size.
+- (void)adjustRelativeCropSize;
+
 @end
 
 
